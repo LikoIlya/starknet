@@ -37,7 +37,7 @@ class Transfer(Starknet):
 
         logger.info(f"[{self._id}][{hex(self.address)}] Make transfer to {self.recipient} | {amount} {token}")
 
-        contract = self.get_contract(STARKNET_TOKENS[token])
+        contract = self.get_contract(STARKNET_TOKENS[token], cairo_version=1)
 
         balance = await self.get_balance(STARKNET_TOKENS[token])
 

@@ -442,7 +442,7 @@ async def make_transfer(_id, key, type_account, recipient):
     Transfer ETH/STRK
     """
 
-    token = "ETH"
+    token = "STRK"
 
     min_amount = 0.0001
     max_amount = 0.0002
