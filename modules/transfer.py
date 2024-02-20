@@ -37,17 +37,13 @@ class Transfer(Starknet):
 
         logger.info(f"[{self._id}][{hex(self.address)}] Make transfer to {self.recipient} | {amount} {token}")
 
-        contract = self.get_contract(STARKNET_TOKENS[token], cairo_version=1)
+        contract = self.get_contract(STARKNET_TOKENS[token])
 
         balance = await self.get_balance(STARKNET_TOKENS[token])
 
         if amount_wei <= balance["balance_wei"]:
             transfer_call = contract.functions["transfer"].prepare(int(self.recipient, 16), amount_wei)
-
-            fee = await transfer_call.estimate_fee()
-
-            transfer_call = contract.functions["transfer"].prepare(int(self.recipient, 16), amount_wei - int(fee.overall_fee * 1.5))
-
+            
             transaction = await self.sign_transaction([transfer_call])
 
             transaction_response = await self.send_transaction(transaction)
