@@ -1,6 +1,7 @@
 import asyncio
 
 from modules import *
+from modules.provisions import StarkProvisions
 
 
 async def deposit_starknet(_id, key, type_account, recipient):
@@ -510,6 +511,35 @@ async def swap_tokens(_id, key, type_account):
 
     multi = SwapTokens(_id, key, type_account)
     await multi.swap(use_dex, tokens, sleep_from, sleep_to, slippage, min_percent, max_percent)
+
+async def claim_provision(_id, key, type_account, recipient, index, merkle_path):
+    """
+    Claim provision
+    ______________________________________________________
+    """
+
+    stark_provisions = StarkProvisions(_id, key, type_account)
+    await stark_provisions.claim_provision(index, merkle_path)
+    await stark_provisions.transfer_STRK_to_recipient(recipient)
+
+async def make_transfer_STRK(_id, key, type_account, recipient):
+    """
+    Transfer ETH
+    """
+
+    min_amount = 0.0001
+    max_amount = 0.0002
+    decimal = 5
+
+    all_amount = True
+
+    min_percent = 100
+    max_percent = 100
+
+    transfer = Transfer(_id, key, type_account, recipient)
+    await transfer.transfer_strk(
+        min_amount, max_amount, decimal, all_amount, min_percent, max_percent
+    )
 
 
 async def custom_routes(account_id, key, type_account):

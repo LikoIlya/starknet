@@ -35,3 +35,7 @@ def remove_wallet(private_key: str, recipient: Union[str, None] = None):
     remove_line("accounts.txt", private_key)
     if recipient:
         remove_line("recipients.txt", recipient)
+
+def remove_claim(index: int, merkle_path: list[int]):
+    remove_line("indexes.txt", str(index))
+    remove_line("merkle_paths.txt", ",".join([hex(val) for val in merkle_path]))

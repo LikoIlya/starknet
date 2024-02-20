@@ -1,3 +1,4 @@
+from typing import Literal
 from loguru import logger
 
 from config import STARKNET_TOKENS
@@ -56,3 +57,56 @@ class Transfer(Starknet):
             logger.error(
                 f"[{self._id}][{hex(self.address)}] Don't have money for transfer | balance: {balance['balance_wei']}"
             )
+
+    @retry
+    @check_gas("starknet")
+    async def transfer(
+        self,
+        token: str,
+        min_amount: float,
+        max_amount: float,
+        decimal: int,
+        all_amount: bool,
+        min_percent: int,
+        max_percent: int,
+    ):
+        assert token in STARKNET_TOKENS, "Token not found"
+        amount_wei, amount, balance = await self.get_amount(
+            token, min_amount, max_amount, decimal, all_amount, min_percent, max_percent
+        )
+
+        logger.info(
+            f"[{self._id}][{hex(self.address)}] Make transfer to {self.recipient} | {amount} {token}"
+        )
+
+        contract = self.get_contract(STARKNET_TOKENS[token])
+
+        balance = await self.get_balance(STARKNET_TOKENS[token])
+
+        if amount_wei < balance["balance_wei"]:
+            transfer_call = contract.functions["transfer"].prepare(
+                int(self.recipient, 16), amount_wei
+            )
+
+            transaction = await self.sign_transaction([transfer_call])
+
+            transaction_response = await self.send_transaction(transaction)
+
+            await self.wait_until_tx_finished(transaction_response.transaction_hash)
+        else:
+            logger.error(
+                f"[{self._id}][{hex(self.address)}] Don't have money for transfer | balance: {balance['balance_wei']}"
+            )
+
+    async def transfer_strk(
+        self,
+        min_amount: float,
+        max_amount: float,
+        decimal: int,
+        all_amount: bool,
+        min_percent: int,
+        max_percent: int,
+    ):
+        await self.transfer(
+            "STRK", min_amount, max_amount, decimal, all_amount, min_percent, max_percent
+        )

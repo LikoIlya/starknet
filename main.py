@@ -1,4 +1,5 @@
 import asyncio
+from functools import partial
 import random
 import sys
 import time
@@ -9,8 +10,8 @@ import questionary
 from loguru import logger
 from questionary import Choice
 
-from config import ACCOUNTS, RECIPIENTS
-from utils.helpers import remove_wallet
+from config import ACCOUNTS, INDEXES, MERKLE_PATHS, RECIPIENTS
+from utils.helpers import remove_claim, remove_wallet
 from utils.sleeping import sleep
 from modules_settings import *
 from settings import (
