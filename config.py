@@ -9,6 +9,18 @@ with open("accounts.txt", "r") as file:
 with open("recipients.txt", "r") as file:
     RECIPIENTS = [row.strip() for row in file]
 
+with open("claim/indexes.txt", "r") as file:
+    INDEXES = [int(row.strip(),0) for row in file]
+
+with open("claim/merkle_paths.txt", "r") as file:
+    MERKLE_PATHS = [
+        [
+            int(val,0) 
+            for val in row.strip(" []").split(',') 
+        ] 
+        for row in file
+    ]
+
 with open('data/abi/erc20_abi.json') as file:
     ERC20_ABI = json.load(file)
 
@@ -83,6 +95,9 @@ with open('data/abi/almanac/abi.json') as file:
 
 with open('data/abi/ninth/abi.json') as file:
     NINTH_ABI = json.load(file)
+
+with open('data/abi/starknet_claim/abi.json') as file:
+    STARKNET_CLAIM_ABI = json.load(file)
 
 SPACESHARD_API = "https://starkgate.spaceshard.io/v1/gas-cost/"
 
@@ -164,3 +179,5 @@ STARKVERSE_CONTRACT = 0x060582df2cd4ad2c988b11fdede5c43f56a432e895df255ccd1af129
 ALMANAC_CONTRACT = 0x07d4dc2bf13ede97b9e458dc401d4ff6dd386a02049de879ebe637af8299f91d
 
 NINTH_CONTRACT = 0x07038b75cd6557f4c788971eacc37cf6554acad7146398d42bcc7da3a05b5218
+
+STARKNET_CLAIM_CONTRACT = 0x06793d9e6ed7182978454c79270e5b14d2655204ba6565ce9b0aa8a3c3121025
