@@ -10,7 +10,7 @@ import questionary
 from loguru import logger
 from questionary import Choice
 
-from config import ACCOUNTS, INDEXES, MERKLE_PATHS, RECIPIENTS
+from config import ACCOUNTS, RECIPIENTS
 from utils.helpers import remove_claim, remove_wallet
 from utils.sleeping import sleep
 from modules_settings import *
@@ -66,7 +66,7 @@ def get_module():
             Choice("35) Use custom routes ", custom_routes),
             Choice("36) Check transaction count", "tx_checker"),
             Choice("37) Exit", "exit"),
-            Choice("38) Claim provision", claim_provision),
+            # Choice("38) Claim provision", claim_provision),
         ],
         qmark="⚙️ ",
         pointer="✅ "
@@ -89,18 +89,18 @@ def get_wallets(use_recipients: bool = False, use_claim: bool = False):
                 "recipient": account_with_recipients[key],
             } for _id, key in enumerate(account_with_recipients, start=1)
         ]
-    elif use_claim:
-        account_with_claim_stuff = zip(ACCOUNTS, RECIPIENTS, INDEXES, MERKLE_PATHS)
+    # elif use_claim:
+    #     account_with_claim_stuff = zip(ACCOUNTS, RECIPIENTS, INDEXES, MERKLE_PATHS)
 
-        wallets = [
-            {
-                "id": _id,
-                "key": key,
-                "recipient": recipient,
-                "index": index,
-                "merkle_path": merkle_path,
-            } for _id, (key, recipient, index, merkle_path) in enumerate(account_with_claim_stuff, start=1)
-        ]
+    #     wallets = [
+    #         {
+    #             "id": _id,
+    #             "key": key,
+    #             "recipient": recipient,
+    #             "index": index,
+    #             "merkle_path": merkle_path,
+    #         } for _id, (key, recipient, index, merkle_path) in enumerate(account_with_claim_stuff, start=1)
+    #     ]
     else:
         wallets = [
             {
@@ -123,8 +123,8 @@ async def run_module(module, account_id, key, recipient: Union[str, None] = None
 
     if REMOVE_WALLET:
         remove_wallet(key, recipient)
-        if isinstance(module, partial) and module.func == claim_provision:
-            remove_claim(module.keywords['index'], module.keywords['merkle_path'])
+        # if isinstance(module, partial) and module.func == claim_provision:
+        #     remove_claim(module.keywords['index'], module.keywords['merkle_path'])
 
 
     await sleep(SLEEP_FROM, SLEEP_TO)
@@ -137,8 +137,8 @@ def _async_run_module(module, account_id, key, recipient):
 def main(module):
     if module in [deposit_starknet, withdraw_starknet, bridge_orbiter, make_transfer]:
         wallets = get_wallets(use_recipients=True)
-    elif module in [claim_provision]:
-        wallets = get_wallets(use_claim=True)
+    # elif module in [claim_provision]:
+    #     wallets = get_wallets(use_claim=True)
     else:
         wallets = get_wallets()
 
@@ -147,12 +147,12 @@ def main(module):
 
     with ThreadPoolExecutor(max_workers=QUANTITY_THREADS) as executor:
         for _, account in enumerate(wallets, start=1):
-            if module == claim_provision:
-                module = partial(
-                    claim_provision,
-                    index=account.get("index"),
-                    merkle_path=account.get("merkle_path")
-                )
+            # if module == claim_provision:
+            #     module = partial(
+            #         claim_provision,
+            #         index=account.get("index"),
+            #         merkle_path=account.get("merkle_path")
+            #     )
             executor.submit(
                 _async_run_module,
                 module,
