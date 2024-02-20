@@ -1,7 +1,6 @@
 import asyncio
 
 from modules import *
-from modules.provisions import StarkProvisions
 
 
 async def deposit_starknet(_id, key, type_account, recipient):
