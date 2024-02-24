@@ -3,7 +3,7 @@ import asyncio
 from modules import *
 
 
-async def deposit_starknet(_id, key, type_account, recipient):
+async def deposit_starknet(_id, key, type_account, proxy, recipient):
     """
     Deposit to Starknet
     ______________________________________________________
@@ -19,31 +19,31 @@ async def deposit_starknet(_id, key, type_account, recipient):
     min_percent = 500
     max_percent = 500
 
-    bridge = Bridge(_id, key, type_account, recipient)
+    bridge = Bridge(_id, key, type_account, proxy, recipient)
     await bridge.deposit(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
-async def withdraw_starknet(_id, key, type_account, recipient):
+async def withdraw_starknet(_id, key, type_account, proxy, recipient):
     """
     Withdraw from Starknet
     ______________________________________________________
     all_amount - swap from min_percent to max_percent
     """
 
-    min_amount = 0.019
-    max_amount = 0.02
-    decimal = 5
+    min_amount = 0.000001
+    max_amount = 0.000002
+    decimal = 7
 
     all_amount = False
 
     min_percent = 5
     max_percent = 5
 
-    bridge = Starknet(_id, key, type_account)
+    bridge = Starknet(_id, key, type_account, proxy)
     await bridge.withdraw(recipient, min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
-async def bridge_orbiter(_id, key, type_account, recipient):
+async def bridge_orbiter(_id, key, type_account, proxy, recipient):
     """
     Bridge on Orbiter
     ______________________________________________________
@@ -62,11 +62,11 @@ async def bridge_orbiter(_id, key, type_account, recipient):
     min_percent = 2
     max_percent = 5
 
-    bridge = Orbiter(_id, key, type_account, recipient)
+    bridge = Orbiter(_id, key, type_account, proxy, recipient)
     await bridge.bridge(from_chain, to_chain, min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
-async def swap_avnu(_id, key, type_account):
+async def swap_avnu(_id, key, type_account, proxy):
     """
     Make swap on Avnu
     ______________________________________________________
@@ -91,13 +91,13 @@ async def swap_avnu(_id, key, type_account):
     min_percent = 10
     max_percent = 10
 
-    avnu = Avnu(_id, key, type_account)
+    avnu = Avnu(_id, key, type_account, proxy)
     await avnu.swap(
         from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
     )
 
 
-async def swap_jediswap(_id, key, type_account):
+async def swap_jediswap(_id, key, type_account, proxy):
     """
     Make swap on Jediswap
     ______________________________________________________
@@ -122,13 +122,13 @@ async def swap_jediswap(_id, key, type_account):
     min_percent = 100
     max_percent = 100
 
-    jediswap = Jediswap(_id, key, type_account)
+    jediswap = Jediswap(_id, key, type_account, proxy)
     await jediswap.swap(
         from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
     )
 
 
-async def swap_myswap(_id, key, type_account):
+async def swap_myswap(_id, key, type_account, proxy):
     """
     Make swap on MySwap
     ______________________________________________________
@@ -153,13 +153,13 @@ async def swap_myswap(_id, key, type_account):
     min_percent = 5
     max_percent = 10
 
-    myswap = MySwap(_id, key, type_account)
+    myswap = MySwap(_id, key, type_account, proxy)
     await myswap.swap(
         from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
     )
 
 
-async def swap_starkswap(_id, key, type_account):
+async def swap_starkswap(_id, key, type_account, proxy):
     """
     Make swap on 10kSwap
     ______________________________________________________
@@ -184,13 +184,13 @@ async def swap_starkswap(_id, key, type_account):
     min_percent = 100
     max_percent = 100
 
-    starkswap = StarkSwap(_id, key, type_account)
+    starkswap = StarkSwap(_id, key, type_account, proxy)
     await starkswap.swap(
         from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
     )
 
 
-async def swap_sithswap(_id, key, type_account):
+async def swap_sithswap(_id, key, type_account, proxy):
     """
     Make swap on SithSwap
     ______________________________________________________
@@ -215,13 +215,13 @@ async def swap_sithswap(_id, key, type_account):
     min_percent = 100
     max_percent = 100
 
-    sithswap = SithSwap(_id, key, type_account)
+    sithswap = SithSwap(_id, key, type_account, proxy)
     await sithswap.swap(
         from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
     )
 
 
-async def swap_protoss(_id, key, type_account):
+async def swap_protoss(_id, key, type_account, proxy):
     """
     Make swap on Protoss
     ______________________________________________________
@@ -246,13 +246,13 @@ async def swap_protoss(_id, key, type_account):
     min_percent = 100
     max_percent = 100
 
-    protoss = Protoss(_id, key, type_account)
+    protoss = Protoss(_id, key, type_account, proxy)
     await protoss.swap(
         from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
     )
 
 
-async def deposit_zklend(_id, key, type_account):
+async def deposit_zklend(_id, key, type_account, proxy):
     """
     Make deposit on ZkLend
     ______________________________________________________
@@ -278,14 +278,14 @@ async def deposit_zklend(_id, key, type_account):
     min_percent = 10
     max_percent = 50
 
-    zklend = ZkLend(_id, key, type_account)
+    zklend = ZkLend(_id, key, type_account, proxy)
     await zklend.deposit(
         use_token, min_amount, max_amount, decimal, sleep_from,
         sleep_to, make_withdraw, all_amount, min_percent, max_percent
     )
 
 
-async def deposit_nostra(_id, key, type_account):
+async def deposit_nostra(_id, key, type_account, proxy):
     """
     Make deposit on Nostra
     ______________________________________________________
@@ -311,14 +311,14 @@ async def deposit_nostra(_id, key, type_account):
     min_percent = 10
     max_percent = 50
 
-    zklend = Nostra(_id, key, type_account)
+    zklend = Nostra(_id, key, type_account, proxy)
     await zklend.deposit(
         use_token, min_amount, max_amount, decimal, sleep_from,
         sleep_to, make_withdraw, all_amount, min_percent, max_percent
     )
 
 
-async def withdraw_zklend(_id, key, type_account):
+async def withdraw_zklend(_id, key, type_account, proxy):
     """
     Make withdraw from ZkLend
     ______________________________________________________
@@ -327,11 +327,11 @@ async def withdraw_zklend(_id, key, type_account):
 
     use_token = ["ETH", "DAI", "USDC"]
 
-    zklend = ZkLend(_id, key, type_account)
+    zklend = ZkLend(_id, key, type_account, proxy)
     await zklend.withdraw_all(use_token)
 
 
-async def withdraw_nostra(_id, key, type_account):
+async def withdraw_nostra(_id, key, type_account, proxy):
     """
     Make withdraw from Nostra
     ______________________________________________________
@@ -340,11 +340,11 @@ async def withdraw_nostra(_id, key, type_account):
 
     use_token = ["ETH"]
 
-    zklend = Nostra(_id, key, type_account)
+    zklend = Nostra(_id, key, type_account, proxy)
     await zklend.withdraw_all(use_token)
 
 
-async def enable_collateral_zklend(_id, key, type_account):
+async def enable_collateral_zklend(_id, key, type_account, proxy):
     """
     Enable collaterl on ZkLend
     ______________________________________________________
@@ -353,11 +353,11 @@ async def enable_collateral_zklend(_id, key, type_account):
 
     use_token = ["ETH", "DAI", "USDC"]
 
-    zklend = ZkLend(_id, key, type_account)
+    zklend = ZkLend(_id, key, type_account, proxy)
     await zklend.enable_collateral(use_token)
 
 
-async def mint_starkstars(_id, key, type_account):
+async def mint_starkstars(_id, key, type_account, proxy):
     """
     Mint starkstars NFT
     ______________________________________________________
@@ -395,11 +395,11 @@ async def mint_starkstars(_id, key, type_account):
     sleep_from = 5
     sleep_to = 10
 
-    starkstars = StarkStars(_id, key, type_account)
+    starkstars = StarkStars(_id, key, type_account, proxy)
     await starkstars.mint(contracts, quantity_mint_min, quantity_mint_max, mint_all, sleep_from, sleep_to)
 
 
-async def disable_collateral_zklend(_id, key, type_account):
+async def disable_collateral_zklend(_id, key, type_account, proxy):
     """
     Disable collateral on ZkLend
     ______________________________________________________
@@ -408,11 +408,11 @@ async def disable_collateral_zklend(_id, key, type_account):
 
     use_token = ["DAI"]
 
-    zklend = ZkLend(_id, key, type_account)
+    zklend = ZkLend(_id, key, type_account, proxy)
     await zklend.disable_collateral(use_token)
 
 
-async def deploy_nft(_id, key, type_account):
+async def deploy_nft(_id, key, type_account, proxy):
     """
     Deploy and mint NFTon StarkGuardians
     """
@@ -420,11 +420,11 @@ async def deploy_nft(_id, key, type_account):
     sleep_from = 10
     sleep_to = 20
 
-    stark_guardians = StarkGuardians(_id, key, type_account)
+    stark_guardians = StarkGuardians(_id, key, type_account, proxy)
     await stark_guardians.deploy_nft(sleep_from, sleep_to)
 
 
-async def mint_starknet_id(_id, key, type_account):
+async def mint_starknet_id(_id, key, type_account, proxy):
     """
     Mint Starknet ID
     ______________________________________________________
@@ -433,14 +433,16 @@ async def mint_starknet_id(_id, key, type_account):
 
     hard_mint = True
 
-    starknet_id = StarknetId(_id, key, type_account)
+    starknet_id = StarknetId(_id, key, type_account, proxy)
     await starknet_id.mint(hard_mint)
 
 
-async def make_transfer(_id, key, type_account, recipient):
+async def make_transfer(_id, key, type_account, proxy, recipient):
     """
-    Transfer ETH
+    Transfer ETH/STRK
     """
+
+    token = "STRK"
 
     min_amount = 0.0001
     max_amount = 0.0002
@@ -448,14 +450,14 @@ async def make_transfer(_id, key, type_account, recipient):
 
     all_amount = True
 
-    min_percent = 5
-    max_percent = 10
+    min_percent = 100
+    max_percent = 100
 
-    transfer = Transfer(_id, key, type_account, recipient)
-    await transfer.transfer_eth(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
+    transfer = Transfer(_id, key, type_account, proxy, recipient)
+    await transfer.transfer(token, min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
-async def swap_multiswap(_id, key, type_account):
+async def swap_multiswap(_id, key, type_account, proxy):
     """
     Multi-Swap module: Automatically performs the specified number of swaps in one of the dexes.
     ______________________________________________________
@@ -481,13 +483,13 @@ async def swap_multiswap(_id, key, type_account):
     min_percent = 10
     max_percent = 40
 
-    multi = Multiswap(_id, key, type_account)
+    multi = Multiswap(_id, key, type_account, proxy)
     await multi.swap(
         use_dex, use_tokens, sleep_from, sleep_to, min_swap, max_swap, slippage, min_percent, max_percent
     )
 
 
-async def swap_tokens(_id, key, type_account):
+async def swap_tokens(_id, key, type_account, proxy):
     """
     SwapTokens module: Automatically swap tokens to ETH
     ______________________________________________________
@@ -506,11 +508,11 @@ async def swap_tokens(_id, key, type_account):
     min_percent = 100
     max_percent = 100
 
-    multi = SwapTokens(_id, key, type_account)
+    multi = SwapTokens(_id, key, type_account, proxy)
     await multi.swap(use_dex, tokens, sleep_from, sleep_to, slippage, min_percent, max_percent)
 
 
-async def custom_routes(account_id, key, type_account):
+async def custom_routes(account_id, key, type_account, proxy):
     """
         BRIDGE:
             – deposit_starknet
@@ -564,70 +566,75 @@ async def custom_routes(account_id, key, type_account):
 
     random_module = True
 
-    routes = Routes(account_id, key, type_account)
+    routes = Routes(account_id, key, type_account, proxy)
     await routes.start(use_modules, sleep_from, sleep_to, random_module)
 
 
 #########################################
 ########### NO NEED TO CHANGE ###########
 #########################################
-async def send_mail_dmail(_id, key, type_account):
-    dmail = Dmail(_id, key, type_account)
+async def send_mail_dmail(_id, key, type_account, proxy):
+    dmail = Dmail(_id, key, type_account, proxy)
     await dmail.send_mail()
 
 
-async def create_collection_pyramid(_id, key, type_account):
-    pyramid = Pyramid(_id, key, type_account)
+async def create_collection_pyramid(_id, key, type_account, proxy):
+    pyramid = Pyramid(_id, key, type_account, proxy)
     await pyramid.mint()
 
 
-async def cancel_order_unframed(_id, key, type_account):
-    unframed = Unframed(_id, key, type_account)
+async def cancel_order_unframed(_id, key, type_account, proxy):
+    unframed = Unframed(_id, key, type_account, proxy)
     await unframed.cancel_order()
 
 
-async def cancel_order_flex(_id, key, type_account):
-    flex = Flex(_id, key, type_account)
+async def cancel_order_flex(_id, key, type_account, proxy):
+    flex = Flex(_id, key, type_account, proxy)
     await flex.cancel_order()
 
 
-async def mint_gol(_id, key, type_account):
-    gol = Gol(_id, key, type_account)
+async def mint_gol(_id, key, type_account, proxy):
+    gol = Gol(_id, key, type_account, proxy)
     await gol.mint_token()
 
 
-async def deploy_token(_id, key, type_account):
-    stark_guardians = StarkGuardians(_id, key, type_account)
+async def deploy_token(_id, key, type_account, proxy):
+    stark_guardians = StarkGuardians(_id, key, type_account, proxy)
     await stark_guardians.deploy_token()
 
 
-async def mint_starkverse(_id, key, type_account):
-    starkverse = Starkverse(_id, key, type_account)
+async def mint_starkverse(_id, key, type_account, proxy):
+    starkverse = Starkverse(_id, key, type_account, proxy)
     await starkverse.mint()
 
 
-async def approve_almanac(_id, key, type_account):
-    almanac = Almanac(_id, key, type_account)
+async def approve_almanac(_id, key, type_account, proxy):
+    almanac = Almanac(_id, key, type_account, proxy)
     await almanac.approve_nft()
 
 
-async def approve_ninth(_id, key, type_account):
-    ninth = Ninth(_id, key, type_account)
+async def approve_ninth(_id, key, type_account, proxy):
+    ninth = Ninth(_id, key, type_account, proxy)
     await ninth.approve_token()
 
 
-async def deploy_argent(_id, key, type_account):
-    starknet = Starknet(_id, key, type_account)
+async def deploy_argent(_id, key, type_account, proxy):
+    starknet = Starknet(_id, key, type_account, proxy)
     await starknet.deploy_argent()
 
 
-async def upgrade_argent(_id, key, type_account):
-    starknet = Starknet(_id, key, type_account)
+async def upgrade_argent(_id, key, type_account, proxy):
+    starknet = Starknet(_id, key, type_account, proxy)
     await starknet.upgrade_argent()
 
 
-async def upgrade_braavos(_id, key, type_account):
-    starknet = Starknet(_id, key, type_account)
+async def enable_strk_argent(_id, key, type_account, proxy):
+    starknet = Starknet(_id, key, type_account, proxy)
+    await starknet.argentx_enable_strk()
+
+
+async def upgrade_braavos(_id, key, type_account, proxy):
+    starknet = Starknet(_id, key, type_account, proxy)
     await starknet.upgrade_braavos()
 
 

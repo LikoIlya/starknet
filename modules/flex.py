@@ -7,8 +7,8 @@ from config import FLEX_CONTRACT, FLEX_ABI
 
 
 class Flex(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
         self.contract = self.get_contract(FLEX_CONTRACT, FLEX_ABI)
 

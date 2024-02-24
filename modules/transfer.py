@@ -7,15 +7,23 @@ from . import Starknet
 
 
 class Transfer(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str, recipient: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+    def __init__(
+        self,
+        _id: int,
+        private_key: str,
+        type_account: str,
+        recipient: str,
+        proxy=None,
+    ) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
         self.recipient = recipient
 
     @retry
     @check_gas("starknet")
-    async def transfer_eth(
+    async def transfer(
             self,
+            token: str,
             min_amount: float,
             max_amount: float,
             decimal: int,
@@ -24,7 +32,7 @@ class Transfer(Starknet):
             max_percent: int
     ):
         amount_wei, amount, balance = await self.get_amount(
-            "ETH",
+            token,
             min_amount,
             max_amount,
             decimal,
@@ -33,16 +41,22 @@ class Transfer(Starknet):
             max_percent
         )
 
-        logger.info(f"[{self._id}][{hex(self.address)}] Make transfer to {self.recipient} | {amount} ETH")
+        logger.info(f"[{self._id}][{hex(self.address)}] Make transfer to {self.recipient} | {amount} {token}")
 
-        contract = self.get_contract(STARKNET_TOKENS["ETH"])
+        contract = self.get_contract(STARKNET_TOKENS[token])
 
-        balance = await self.get_balance(STARKNET_TOKENS["ETH"])
+        balance = await self.get_balance(STARKNET_TOKENS[token])
 
         if amount_wei < balance["balance_wei"]:
             transfer_call = contract.functions["transfer"].prepare(int(self.recipient, 16), amount_wei)
 
+            fee = await transfer_call.estimate_fee()
+
             transaction = await self.sign_transaction([transfer_call])
+
+            transfer_call = contract.functions["transfer"].prepare(
+                int(self.recipient, 16), amount_wei - int(fee.overall_fee * 1.5)
+            )
 
             transaction_response = await self.send_transaction(transaction)
 

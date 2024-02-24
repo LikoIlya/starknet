@@ -9,11 +9,19 @@ from config import ORBITER_CONTRACTS, ORBITER_DEPOSIT_ABI, STARKNET_TOKENS, ORBI
 
 
 class Orbiter:
-    def __init__(self, _id: int, private_key: str, type_account: str, recipient: str) -> None:
+    def __init__(
+        self,
+        _id: int,
+        private_key: str,
+        type_account: str,
+        recipient: str,
+        proxy=None,
+    ) -> None:
         self._id = _id
         self.private_key = private_key
         self.recipient = recipient
         self.type_account = type_account
+        self.proxy = proxy
 
         self.chain_ids = {
             "ethereum": "1",
@@ -45,6 +53,7 @@ class Orbiter:
                 url=url,
                 headers={"Content-Type": "application/json"},
                 json=data,
+                proxy=self.proxy
             )
 
             response_data = await response.json()
@@ -70,7 +79,7 @@ class Orbiter:
             min_percent: int,
             max_percent: int
     ):
-        eth_account = Account(self._id, self.private_key, self.recipient, chain=from_chain)
+        eth_account = Account(self._id, self.private_key, self.recipient, chain=from_chain, proxy=self.proxy)
 
         amount_wei, amount, balance = await eth_account.get_amount(
             min_amount,
@@ -128,7 +137,7 @@ class Orbiter:
             min_percent: int,
             max_percent: int
     ):
-        starknet_account = Starknet(self._id, self.private_key, self.type_account)
+        starknet_account = Starknet(self._id, self.private_key, self.type_account, proxy=self.proxy)
 
         amount_wei, amount, balance = await starknet_account.get_amount(
             "ETH",

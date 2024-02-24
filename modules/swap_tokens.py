@@ -1,21 +1,22 @@
 import random
-from typing import List, Union
+from typing import List, Literal, Type, Union
 
 from loguru import logger
 from config import STARKNET_TOKENS
 from modules import *
+from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from utils.sleeping import sleep
 
 
 class SwapTokens(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
         self.private_key = private_key
         self.type_account = type_account
-        self.swap_modules = {
+        self.swap_modules: dict[str, Type[SwapInterface]] = {
             "jediswap": Jediswap,
             "myswap": MySwap,
             "10kswap": StarkSwap,
@@ -49,7 +50,7 @@ class SwapTokens(Starknet):
             balance = await self.get_balance(STARKNET_TOKENS[token])
 
             if balance["balance_wei"] > 0:
-                swap_module = self.get_swap_module(use_dex)(self._id, self.private_key, self.type_account)
+                swap_module = self.get_swap_module(use_dex)(self._id, self.private_key, self.type_account, proxy=self.proxy)
                 await swap_module.swap(
                     token,
                     "ETH",

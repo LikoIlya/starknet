@@ -9,8 +9,8 @@ from config import UNFRAMED_CONTRACT, UNFRAMED_ABI
 
 
 class Unframed(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
     @retry
     @check_gas("starknet")

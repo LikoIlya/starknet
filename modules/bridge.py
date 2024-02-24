@@ -7,17 +7,24 @@ from starknet_py.net.full_node_client import FullNodeClient
 
 from utils.gas_checker import check_gas
 from utils.helpers import retry
+from utils.proxy_rpc_client import ProxyFullNodeClient
 from . import Account
 from config import BRIDGE_CONTRACTS, DEPOSIT_ABI, RPC
 
 
 class Bridge(Account):
 
-    def __init__(self, _id: int, private_key: str, type_account: str, recipient: str) -> None:
-        super().__init__(_id, private_key, recipient)
-
+    def __init__(
+        self,
+        _id: int,
+        private_key: str,
+        type_account: str,
+        recipient: str, 
+        proxy = None,
+    ) -> None:
+        super().__init__(_id, private_key, recipient, proxy=proxy)
         self.type_account = type_account
-        self.client = FullNodeClient(random.choice(RPC["starknet"]["rpc"]))
+        self.client = ProxyFullNodeClient(random.choice(RPC["starknet"]["rpc"]), proxy=self.proxy)
 
     async def get_l2_gas(self, amount: int):
         estimate_fee = await self.client.estimate_message_fee(

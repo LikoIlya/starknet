@@ -43,7 +43,7 @@
   },
   "starknet": {
     "rpc": [
-      "https://starknet-mainnet.public.blastapi.io"
+      "http://138.68.98.42:6060"
     ],
     "explorer": "https://starkscan.co/tx/",
     "token": "ETH"

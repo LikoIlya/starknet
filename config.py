@@ -9,6 +9,9 @@ with open("accounts.txt", "r") as file:
 with open("recipients.txt", "r") as file:
     RECIPIENTS = [row.strip() for row in file]
 
+with open("proxies.txt", "r") as file:
+    PROXIES = [row.strip() for row in file]
+
 with open('data/abi/erc20_abi.json') as file:
     ERC20_ABI = json.load(file)
 

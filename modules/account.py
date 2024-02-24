@@ -14,13 +14,16 @@ from settings import FEE_MULTIPLIER
 
 
 class Account:
-    def __init__(self, _id: int, private_key: str, recipient: str, chain: str = "ethereum") -> None:
+    def __init__(self, _id: int, private_key: str, recipient: str, chain: str = "ethereum", proxy=None) -> None:
         self._id = _id
         self.private_key = private_key
         self.recipient = recipient
-
+        self.proxy = proxy
         self.w3 = Web3(
-            Web3.AsyncHTTPProvider(random.choice(RPC[chain]["rpc"])),
+            Web3.AsyncHTTPProvider(
+                random.choice(RPC[chain]["rpc"]), 
+                request_kwargs={"proxy": proxy}
+            ),
             modules={"eth": (AsyncEth,)},
         )
         self.account = EthereumAccount.from_key(private_key)

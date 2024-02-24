@@ -11,9 +11,8 @@ from config import PYRAMID_CONTRACT, PYRAMID_ABI, STARKNET_TOKENS
 
 
 class Pyramid(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
-
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
         self.contract = self.get_contract(PYRAMID_CONTRACT, PYRAMID_ABI)
 
     async def get_mint_cost(self):

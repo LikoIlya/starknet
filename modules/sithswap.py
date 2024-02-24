@@ -3,14 +3,15 @@ import time
 from loguru import logger
 
 from config import SITHSWAP_CONTRACT, SITHSWAP_ABI, STARKNET_TOKENS
+from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
 
 
-class SithSwap(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+class SithSwap(SwapInterface):
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
         self.contract = self.get_contract(SITHSWAP_CONTRACT, SITHSWAP_ABI)
 

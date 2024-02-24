@@ -5,6 +5,7 @@ from starknet_py.net.client_models import Call
 from starknet_py.hash.selector import get_selector_from_name
 
 from config import AVNU_CONTRACT, STARKNET_TOKENS
+from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
@@ -51,9 +52,9 @@ async def build_transaction(quote_id: str, recipient: int, slippage: float):
         return response_data
 
 
-class Avnu(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+class Avnu(SwapInterface):
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
     @retry
     @check_gas("starknet")

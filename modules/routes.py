@@ -6,8 +6,8 @@ from . import Starknet
 
 
 class Routes(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
         self.private_key = private_key
         self.type_account = type_account
@@ -43,6 +43,6 @@ class Routes(Starknet):
                 logger.info(f"[{self._id}][{self.address}] Skip module")
                 continue
 
-            await module(self._id, self.private_key, self.type_account)
+            await module(self._id, self.private_key, self.type_account, proxy=self.proxy)
 
             await sleep(sleep_from, sleep_to)

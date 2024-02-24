@@ -1,19 +1,20 @@
 import random
+from typing import Type
 
 from loguru import logger
 from web3 import Web3
 from config import STARKNET_TOKENS
 from modules import *
+from modules.interface.swap import SwapInterface
 from utils.sleeping import sleep
 
 
 class Multiswap(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
-
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
         self.private_key = private_key
         self.type_account = type_account
-        self.swap_modules = {
+        self.swap_modules: dict[str, Type[SwapInterface]] = {
             "jediswap": Jediswap,
             "myswap": MySwap,
             "10kswap": StarkSwap,
@@ -53,7 +54,7 @@ class Multiswap(Starknet):
             from_token = "ETH" if len(tokens_data) == 0 else random.choice(["ETH", *tokens_data])
             to_token = random.choice([token for token in ["ETH", *use_tokens] if token != from_token])
 
-            swap_module = self.get_swap_module(use_dex)(self._id, self.private_key, self.type_account)
+            swap_module = self.get_swap_module(use_dex)(self._id, self.private_key, self.type_account, proxy=self.proxy)
             await swap_module.swap(
                 from_token,
                 to_token,

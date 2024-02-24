@@ -13,8 +13,8 @@ from config import NOSTRA_CONTRACTS, NOSTRA_ABI, STARKNET_TOKENS
 
 
 class Nostra(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
     async def get_deposit_amount(self, token: str):
         zklend_contract = self.get_contract(NOSTRA_CONTRACTS[token])

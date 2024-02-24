@@ -12,7 +12,6 @@ from starknet_py.hash.address import compute_address
 from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.account.account import Account
 from starknet_py.net.client_models import Call
-from starknet_py.net.full_node_client import FullNodeClient
 from starknet_py.net.models import StarknetChainId, Invoke
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 from web3 import Web3
@@ -35,14 +34,16 @@ from config import (
 )
 from utils.gas_checker import check_gas
 from utils.helpers import retry
+from utils.proxy_rpc_client import ProxyFullNodeClient
 
 
 class Starknet:
 
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy: str=None) -> None:
         self._id = _id
         self.key_pair = KeyPair.from_private_key(private_key)
-        self.client = FullNodeClient(random.choice(RPC["starknet"]["rpc"]))
+        self.proxy = proxy
+        self.client = ProxyFullNodeClient(random.choice(RPC["starknet"]["rpc"]), proxy=proxy)
         self.address = self._create_account(type_account)
         self.account = Account(
             address=self.address,
@@ -52,6 +53,7 @@ class Starknet:
         )
         self.account.ESTIMATED_FEE_MULTIPLIER = FEE_MULTIPLIER
         self.explorer = RPC["starknet"]["explorer"]
+        
 
     def _create_account(self, type_account) -> Union[int, None]:
         if type_account == "argent":

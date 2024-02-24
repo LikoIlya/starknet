@@ -3,14 +3,15 @@ import time
 from loguru import logger
 
 from config import JEDISWAP_CONTRACT, JEDISWAP_ABI, STARKNET_TOKENS
+from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
 
 
-class Jediswap(Starknet):
-    def __init__(self, _id: int, private_key: str, type_account: str) -> None:
-        super().__init__(_id=_id, private_key=private_key, type_account=type_account)
+class Jediswap(SwapInterface):
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy=None) -> None:
+        super().__init__(_id=_id, private_key=private_key, type_account=type_account, proxy=proxy)
 
         self.contract = self.get_contract(JEDISWAP_CONTRACT, JEDISWAP_ABI)
 
