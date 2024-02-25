@@ -19,7 +19,7 @@ async def deposit_starknet(_id, key, type_account, proxy, recipient):
     min_percent = 500
     max_percent = 500
 
-    bridge = Bridge(_id, key, type_account, proxy, recipient)
+    bridge = Bridge(_id, key, type_account, recipient, proxy)
     await bridge.deposit(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
@@ -62,7 +62,7 @@ async def bridge_orbiter(_id, key, type_account, proxy, recipient):
     min_percent = 2
     max_percent = 5
 
-    bridge = Orbiter(_id, key, type_account, proxy, recipient)
+    bridge = Orbiter(_id, key, type_account, recipient, proxy)
     await bridge.bridge(from_chain, to_chain, min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
@@ -453,7 +453,7 @@ async def make_transfer(_id, key, type_account, proxy, recipient):
     min_percent = 100
     max_percent = 100
 
-    transfer = Transfer(_id, key, type_account, proxy, recipient)
+    transfer = Transfer(_id, key, type_account, recipient, proxy)
     await transfer.transfer(token, min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 

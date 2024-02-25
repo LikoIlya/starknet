@@ -2,7 +2,7 @@ from typing import Union
 
 from loguru import logger
 
-from settings import RETRY_COUNT
+from settings import RETRY_COUNT, SLEEP_FROM, SLEEP_TO
 from utils.sleeping import sleep
 
 
@@ -14,8 +14,9 @@ def retry(func):
                 result = await func(*args, **kwargs)
                 return result
             except Exception as e:
+                raise e
                 logger.error(f"Error | {e}")
-                await sleep(10, 60)
+                await sleep(SLEEP_FROM, SLEEP_TO)
                 retries += 1
 
     return wrapper
