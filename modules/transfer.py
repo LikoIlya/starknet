@@ -47,7 +47,7 @@ class Transfer(Starknet):
 
         balance = await self.get_balance(STARKNET_TOKENS[token])
 
-        if amount_wei < balance["balance_wei"]:
+        if amount_wei <= balance["balance_wei"]:
             transfer_call = contract.functions["transfer"].prepare_invoke_v1(int(self.recipient, 16), amount_wei)
 
             fee = await transfer_call.estimate_fee()
