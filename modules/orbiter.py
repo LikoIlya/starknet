@@ -2,20 +2,20 @@ import aiohttp
 from loguru import logger
 from web3 import Web3
 
+from config import ORBITER_CONTRACTS, ORBITER_DEPOSIT_ABI, STARKNET_TOKENS, ORBITER_WITHDRAW_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Account, Starknet
-from config import ORBITER_CONTRACTS, ORBITER_DEPOSIT_ABI, STARKNET_TOKENS, ORBITER_WITHDRAW_ABI
 
 
 class Orbiter:
     def __init__(
-        self,
-        _id: int,
-        private_key: str,
-        type_account: str,
-        recipient: str,
-        proxy=None,
+            self,
+            _id: int,
+            private_key: str,
+            type_account: str,
+            recipient: str,
+            proxy=None,
     ) -> None:
         self._id = _id
         self.private_key = private_key
@@ -158,9 +158,9 @@ class Orbiter:
         bridge_contract = starknet_account.get_contract(ORBITER_CONTRACTS["withdraw"], ORBITER_WITHDRAW_ABI)
         approve_contract = starknet_account.get_contract(STARKNET_TOKENS["ETH"])
 
-        approve_call = approve_contract.functions["approve"].prepare(ORBITER_CONTRACTS["withdraw"], 2 ** 128)
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(ORBITER_CONTRACTS["withdraw"], 2 ** 128)
 
-        transfer_call = bridge_contract.functions["transferERC20"].prepare(
+        transfer_call = bridge_contract.functions["transferERC20"].prepare_invoke_v1(
             STARKNET_TOKENS["ETH"],
             0x64a24243f2aabae8d2148fa878276e6e6e452e3941b417f3c33b1649ea83e11,
             bridge_amount,

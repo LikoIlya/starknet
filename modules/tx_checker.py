@@ -3,9 +3,8 @@ import asyncio
 from loguru import logger
 from tabulate import tabulate
 
-from . import Starknet
-
 from config import ACCOUNTS
+from . import Starknet
 
 
 async def get_nonce(account: Starknet):

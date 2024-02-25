@@ -1,6 +1,7 @@
 import random
 
 from loguru import logger
+
 from utils.sleeping import sleep
 from . import Starknet
 
@@ -16,7 +17,7 @@ class Routes(Starknet):
         if isinstance(module, list):
             return self.process_module(random.choice(module))
         elif isinstance(module, tuple):
-            return [self.process_module(module[0]) for _ in range(random.randint(module[1], module[2]))]
+            return self.process_module(module[random.randint(0, len(module) - 1)])
         else:
             return module
 

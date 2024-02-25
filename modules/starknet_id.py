@@ -1,10 +1,11 @@
 import random
+
 from loguru import logger
 
+from config import STARKNET_ID_CONTRACT, STARKNET_ID_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import STARKNET_ID_CONTRACT, STARKNET_ID_ABI
 
 
 class StarknetId(Starknet):
@@ -21,7 +22,7 @@ class StarknetId(Starknet):
         amount_id = await self.contract.functions["balanceOf"].call(self.address)
 
         if amount_id.balance == 0 or hard_mint:
-            mint_starknet_id_call = self.contract.functions["mint"].prepare(int(random.random() * 1e12))
+            mint_starknet_id_call = self.contract.functions["mint"].prepare_invoke_v1(int(random.random() * 1e12))
 
             transaction = await self.sign_transaction([mint_starknet_id_call])
 

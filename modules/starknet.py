@@ -1,10 +1,9 @@
-import time
-
-import requests
 import random
 import sys
+import time
 from typing import Union, List
 
+import requests
 from loguru import logger
 from starknet_py.cairo.felt import decode_shortstring
 from starknet_py.contract import Contract
@@ -12,11 +11,9 @@ from starknet_py.hash.address import compute_address
 from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.account.account import Account
 from starknet_py.net.client_models import Call
-from starknet_py.net.models import StarknetChainId, Invoke
+from starknet_py.net.models import StarknetChainId, InvokeV3, InvokeV1
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 from web3 import Web3
-
-from settings import CAIRO_VERSION, FEE_MULTIPLIER
 
 from config import (
     BRAAVOS_PROXY_CLASS_HASH,
@@ -30,8 +27,10 @@ from config import (
     RPC,
     ARGENTX_IMPLEMENTATION_CLASS_HASH_NEW,
     BRIDGE_CONTRACTS,
-    ARGENT_ABI, BRAAVOS_IMPLEMENTATION_CLASS_HASH_NEW, BRAAVOS_ABI, BRAAVOS_REGENESIS_ACCOUNT_ID
+    ARGENT_ABI, BRAAVOS_IMPLEMENTATION_CLASS_HASH_NEW, BRAAVOS_ABI, BRAAVOS_REGENESIS_ACCOUNT_ID,
+    ARGENTX_IMPLEMENTATION_CLASS_HASH_STRK
 )
+from settings import CAIRO_VERSION, FEE_MULTIPLIER
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from utils.proxy_rpc_client import ProxyFullNodeClient
@@ -39,7 +38,7 @@ from utils.proxy_rpc_client import ProxyFullNodeClient
 
 class Starknet:
 
-    def __init__(self, _id: int, private_key: str, type_account: str, proxy: str=None) -> None:
+    def __init__(self, _id: int, private_key: str, type_account: str, proxy: str = None) -> None:
         self._id = _id
         self.key_pair = KeyPair.from_private_key(private_key)
         self.proxy = proxy
@@ -51,9 +50,9 @@ class Starknet:
             key_pair=self.key_pair,
             chain=StarknetChainId.MAINNET,
         )
+        logger.info(f'Account is {hex(self.account.address)}')
         self.account.ESTIMATED_FEE_MULTIPLIER = FEE_MULTIPLIER
         self.explorer = RPC["starknet"]["explorer"]
-        
 
     def _create_account(self, type_account) -> Union[int, None]:
         if type_account == "argent":
@@ -65,23 +64,29 @@ class Starknet:
             sys.exit()
 
     def _get_argent_address(self) -> int:
-        if CAIRO_VERSION == 0:
-            selector = get_selector_from_name("initialize")
+        match CAIRO_VERSION:
+            case 0:
+                selector = get_selector_from_name("initialize")
 
-            calldata = [self.key_pair.public_key, 0]
+                calldata = [self.key_pair.public_key, 0]
 
-            address = compute_address(
-                class_hash=ARGENTX_PROXY_CLASS_HASH,
-                constructor_calldata=[ARGENTX_IMPLEMENTATION_CLASS_HASH, selector, len(calldata), *calldata],
-                salt=self.key_pair.public_key,
-            )
-        else:
-            address = compute_address(
-                class_hash=ARGENTX_IMPLEMENTATION_CLASS_HASH_NEW,
-                constructor_calldata=[self.key_pair.public_key, 0],
-                salt=self.key_pair.public_key,
-            )
-
+                address = compute_address(
+                    class_hash=ARGENTX_PROXY_CLASS_HASH,
+                    constructor_calldata=[ARGENTX_IMPLEMENTATION_CLASS_HASH, selector, len(calldata), *calldata],
+                    salt=self.key_pair.public_key,
+                )
+            case 1:
+                address = compute_address(
+                    class_hash=ARGENTX_IMPLEMENTATION_CLASS_HASH_NEW,
+                    constructor_calldata=[self.key_pair.public_key, 0],
+                    salt=self.key_pair.public_key,
+                )
+            case 2:
+                address = compute_address(
+                    class_hash=ARGENTX_IMPLEMENTATION_CLASS_HASH_STRK,
+                    constructor_calldata=[self.key_pair.public_key, 0],
+                    salt=self.key_pair.public_key,
+                )
         return address
 
     def _get_braavos_account(self) -> int:
@@ -147,15 +152,14 @@ class Starknet:
         return amount_wei, amount, balance
 
     async def sign_transaction(self, calls: List[Call]):
-        transaction = await self.account.sign_invoke_transaction(
+        transaction = await self.account.sign_invoke_v1(
             calls=calls,
-            auto_estimate=True,
-            nonce=await self.account.get_nonce(),
+            auto_estimate=True
         )
 
         return transaction
 
-    async def send_transaction(self, transaction: Invoke):
+    async def send_transaction(self, transaction: InvokeV3 | InvokeV1):
         transaction_response = await self.account.client.send_transaction(transaction)
 
         return transaction_response
@@ -203,14 +207,14 @@ class Starknet:
             str(int(time.time()))
         )
 
-        transfer_to_spaceshard = spaceshard_contract.functions["transfer"].prepare(
-            0x06e02b62e101b44382d030d7aee5528bf65eed13d3b2d5da3dfa883a2e1ce5f7,
-            int(gas_cost.json()["result"]["gasCost"])
+        transfer_to_spaceshard = spaceshard_contract.functions["transfer"].prepare_invoke_v1(
+            recipient=0x06e02b62e101b44382d030d7aee5528bf65eed13d3b2d5da3dfa883a2e1ce5f7,
+            amount=int(gas_cost.json()["result"]["gasCost"])
         )
 
-        initiate_withdraw = bridge_contract.functions["initiate_withdraw"].prepare(
-            int(recipient, 16),
-            amount_wei
+        initiate_withdraw = bridge_contract.functions["initiate_withdraw"].prepare_invoke_v1(
+            l1_recipient=int(recipient, 16),
+            amount=amount_wei
         )
 
         transaction = await self.sign_transaction([transfer_to_spaceshard, initiate_withdraw])
@@ -223,10 +227,12 @@ class Starknet:
     @check_gas("starknet")
     async def deploy_argent(self):
         logger.info(f"[{self._id}][{hex(self.address)}] Deploy argent account")
-
         class_hash = ARGENTX_IMPLEMENTATION_CLASS_HASH_NEW
+        match CAIRO_VERSION:
+            case 2:
+                class_hash = ARGENTX_IMPLEMENTATION_CLASS_HASH_STRK
 
-        transaction = await self.account.deploy_account(
+        transaction = await self.account.deploy_account_v1(
             address=self.address,
             class_hash=class_hash,
             salt=self.key_pair.public_key,
@@ -253,7 +259,31 @@ class Starknet:
         if version == "0.2.3":
             logger.info(f"[{self._id}][{hex(self.address)}] Upgrade account to cairo 1")
 
-            upgrade_call = contract.functions["upgrade"].prepare(class_hash, [0])
+            upgrade_call = contract.functions["upgrade"].prepare_invoke_v1(class_hash, [0])
+
+            transaction = await self.sign_transaction([upgrade_call])
+
+            transaction_response = await self.send_transaction(transaction)
+
+            await self.wait_until_tx_finished(transaction_response.transaction_hash)
+        else:
+            logger.info(f"[{self._id}][{hex(self.address)}] No upgrade required")
+
+    @retry
+    @check_gas("starknet")
+    async def argentx_enable_strk(self):
+        class_hash = ARGENTX_IMPLEMENTATION_CLASS_HASH_STRK
+
+        contract = self.get_contract(self.address, ARGENT_ABI)
+
+        account_version = await contract.functions["getVersion"].call()
+
+        version = bytes.fromhex(hex(account_version.as_tuple()[0])[2:]).decode("utf8")
+
+        if version == "0.3.0":
+            logger.info(f"[{self._id}][{hex(self.address)}] Upgrade account to v0.3.1 (enabling STRK fee)")
+
+            upgrade_call = contract.functions["upgrade"].prepare_invoke_v1(class_hash, [0])
 
             transaction = await self.sign_transaction([upgrade_call])
 
@@ -270,7 +300,7 @@ class Starknet:
 
         logger.info(f"[{self._id}][{hex(self.address)}] Upgrade account to cairo 1")
 
-        upgrade_call = contract.functions["upgrade_regenesis"].prepare(
+        upgrade_call = contract.functions["upgrade_regenesis"].prepare_invoke_v1(
             BRAAVOS_IMPLEMENTATION_CLASS_HASH_NEW,
             BRAAVOS_REGENESIS_ACCOUNT_ID
         )

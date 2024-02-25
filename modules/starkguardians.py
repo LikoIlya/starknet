@@ -2,11 +2,11 @@ import random
 
 from loguru import logger
 
+from config import STARKGUARDIANS_CONTRACT, STARKGUARDIANS_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from utils.sleeping import sleep
 from . import Starknet
-from config import STARKGUARDIANS_CONTRACT, STARKGUARDIANS_ABI
 
 
 class StarkGuardians(Starknet):
@@ -29,7 +29,7 @@ class StarkGuardians(Starknet):
 
         token_name, token_symbol = self.get_random_name()
 
-        deploy_call = self.contract.functions["deployContract"].prepare(
+        deploy_call = self.contract.functions["deployContract"].prepare_invoke_v1(
             0x0339d10811d97e91d1343d2faa7fac3116e9714f99b59617705070ada6f5a05a,
             random.randint(38890058876971531151, 85735143683896744799),
             1,
@@ -54,7 +54,7 @@ class StarkGuardians(Starknet):
 
         token_name, token_symbol = self.get_random_name()
 
-        deploy_call = self.contract.functions["deployContract"].prepare(
+        deploy_call = self.contract.functions["deployContract"].prepare_invoke_v1(
             0x745c9a10e7bc32095554c895490cfaac6c4c8cada2e3763faddedfaa72c856a,
             random.randint(38890058876971531151, 85735143683896744799),
             1,
@@ -84,7 +84,7 @@ class StarkGuardians(Starknet):
 
         contract = self.get_contract(data.events[0].from_address, STARKGUARDIANS_ABI)
 
-        mint_call = contract.functions["mint"].prepare(self.address)
+        mint_call = contract.functions["mint"].prepare_invoke_v1(self.address)
 
         transaction = await self.sign_transaction([mint_call])
 

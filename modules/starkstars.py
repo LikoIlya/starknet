@@ -3,11 +3,11 @@ from typing import List
 
 from loguru import logger
 
+from config import STARKNET_TOKENS, STARKSTARS_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from utils.sleeping import sleep
 from . import Starknet
-from config import STARKNET_TOKENS, STARKSTARS_ABI
 
 
 class StarkStars(Starknet):
@@ -36,19 +36,19 @@ class StarkStars(Starknet):
         for _, contract in enumerate(contracts, start=1):
             nft_contract = self.get_contract(contract, STARKSTARS_ABI, 1)
 
-            (mint_price, ) = await nft_contract.functions["get_price"].call()
-            (nft_id, ) = await nft_contract.functions["name"].call()
+            (mint_price,) = await nft_contract.functions["get_price"].call()
+            (nft_id,) = await nft_contract.functions["name"].call()
 
             nft_name = bytearray.fromhex(hex(nft_id)[2:]).decode()
 
             logger.info(f"[{self._id}][{hex(self.address)}] Mint #{nft_name} NFT")
 
-            approve_call = approve_contract.functions["approve"].prepare(
+            approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
                 contract,
                 mint_price
             )
 
-            mint_starkstars_call = nft_contract.functions["mint"].prepare()
+            mint_starkstars_call = nft_contract.functions["mint"].prepare_invoke_v1()
 
             transaction = await self.sign_transaction([approve_call, mint_starkstars_call])
 

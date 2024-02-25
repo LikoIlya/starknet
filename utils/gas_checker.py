@@ -1,14 +1,12 @@
-import time
 import random
 
+from loguru import logger
 from starknet_py.net.full_node_client import FullNodeClient
-
 from web3 import Web3
 from web3.eth import AsyncEth
+
 from config import RPC
 from settings import CHECK_GWEI, MAX_GWEI
-from loguru import logger
-
 from utils.sleeping import sleep
 
 

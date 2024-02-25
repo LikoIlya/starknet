@@ -2,14 +2,12 @@ import random
 from typing import List, Union
 
 from loguru import logger
-from starknet_py.hash.selector import get_selector_from_name
-from starknet_py.net.client_models import Call
 
+from config import NOSTRA_CONTRACTS, NOSTRA_ABI, STARKNET_TOKENS
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from utils.sleeping import sleep
 from . import Starknet
-from config import NOSTRA_CONTRACTS, NOSTRA_ABI, STARKNET_TOKENS
 
 
 class Nostra(Starknet):
@@ -57,14 +55,14 @@ class Nostra(Starknet):
 
         approve_contract = self.get_contract(STARKNET_TOKENS[token])
 
-        approve_call = approve_contract.functions["approve"].prepare(
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
             NOSTRA_CONTRACTS[token],
             amount_wei
         )
 
         nostra_contract = self.get_contract(NOSTRA_CONTRACTS[token], NOSTRA_ABI)
 
-        deposit_call = nostra_contract.functions["mint"].prepare(
+        deposit_call = nostra_contract.functions["mint"].prepare_invoke_v1(
             self.address,
             amount_wei
         )
@@ -94,7 +92,7 @@ class Nostra(Starknet):
         if amount > 0:
             nostra_contract = self.get_contract(NOSTRA_CONTRACTS[token], NOSTRA_ABI)
 
-            withdraw_all_call = nostra_contract.functions["burn"].prepare(
+            withdraw_all_call = nostra_contract.functions["burn"].prepare_invoke_v1(
                 self.address,
                 self.address,
                 amount

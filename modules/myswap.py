@@ -4,7 +4,6 @@ from config import MYSWAP_CONTRACT, MYSWAP_ABI, STARKNET_TOKENS
 from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
-from . import Starknet
 
 
 class MySwap(SwapInterface):
@@ -34,9 +33,9 @@ class MySwap(SwapInterface):
         return pool_id, reverse
 
     async def get_min_amount_out(self, pool_id: int, reverse: bool, amount: int, slippage: float):
-        (pool_data,) = await self.contract.functions["get_pool"].prepare(
-            pool_id
-        ).call()
+        (pool_data,) = (
+            await self.contract.functions["get_pool"].prepare_call(pool_id).call()
+        )
 
         if reverse:
             reserveIn = pool_data.get("token_b_reserves")
@@ -83,12 +82,12 @@ class MySwap(SwapInterface):
 
         approve_contract = self.get_contract(STARKNET_TOKENS[from_token])
 
-        approve_call = approve_contract.functions["approve"].prepare(
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
             MYSWAP_CONTRACT,
             amount_wei
         )
 
-        swap_call = self.contract.functions["swap"].prepare(
+        swap_call = self.contract.functions["swap"].prepare_invoke_v1(
             pool_id,
             STARKNET_TOKENS[from_token],
             amount_wei,

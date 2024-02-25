@@ -1,9 +1,9 @@
 from loguru import logger
 
+from config import FLEX_CONTRACT, FLEX_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import FLEX_CONTRACT, FLEX_ABI
 
 
 class Flex(Starknet):
@@ -17,7 +17,7 @@ class Flex(Starknet):
     async def cancel_order(self):
         logger.info(f"[{self._id}][{hex(self.address)}] Flex cancel order")
 
-        flex_call = self.contract.functions["cancelMakerOrder"].prepare(20)
+        flex_call = self.contract.functions["cancelMakerOrder"].prepare_invoke_v1(20)
 
         transaction = await self.sign_transaction([flex_call])
 

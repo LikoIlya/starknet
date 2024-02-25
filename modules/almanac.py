@@ -1,9 +1,9 @@
 from loguru import logger
 
+from config import ALMANAC_CONTRACT, ALMANAC_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import ALMANAC_CONTRACT, ALMANAC_ABI
 
 
 class Almanac(Starknet):
@@ -17,7 +17,7 @@ class Almanac(Starknet):
     async def approve_nft(self):
         logger.info(f"[{self._id}][{hex(self.address)}] Make Almanac approve")
 
-        approve_call = self.contract.functions["setApprovalForAll"].prepare(
+        approve_call = self.contract.functions["setApprovalForAll"].prepare_invoke_v1(
             0x7d4dc2bf13ede97b9e458dc401d4ff6dd386a02049de879ebe637af8299f91d,
             1
         )

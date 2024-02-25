@@ -1,4 +1,3 @@
-import asyncio
 import random
 import sys
 import time
@@ -10,8 +9,6 @@ from loguru import logger
 from questionary import Choice
 
 from config import ACCOUNTS, RECIPIENTS, PROXIES
-from utils.helpers import remove_wallet
-from utils.sleeping import sleep
 from modules_settings import *
 from settings import (
     TYPE_WALLET,
@@ -22,6 +19,8 @@ from settings import (
     THREAD_SLEEP_FROM,
     THREAD_SLEEP_TO, REMOVE_WALLET
 )
+from utils.helpers import remove_wallet
+from utils.sleeping import sleep
 
 
 def get_module():
@@ -84,7 +83,7 @@ def get_wallets(use_recipients: bool = False):
                 "id": _id,
                 "key": key,
                 "recipient": account_with_recipients[key],
-                "proxy": PROXIES[_id] if len(PROXIES) > _id else None,
+                "proxy": PROXIES[_id - 1] if len(PROXIES) > _id - 1 else None,
             }
             for _id, key in enumerate(account_with_recipients, start=1)
         ]
@@ -139,19 +138,19 @@ def main(module):
                 account.get("recipient", None),
                 account.get("proxy", None)
             )
-            time.sleep(random.randint(THREAD_SLEEP_FROM, THREAD_SLEEP_TO))
+            if _ < len(wallets) - 1:
+                time.sleep(random.randint(THREAD_SLEEP_FROM, THREAD_SLEEP_TO))
 
 
 if __name__ == '__main__':
     print("❤️ Subscribe to me – https://t.me/sybilwave\n")
+    logger.add("logging.log", level="TRACE", filter="*")
 
-    logger.add("logging.log")
-
-    module = get_module()
-    if module == "tx_checker":
+    module_to_run = get_module()
+    if module_to_run == "tx_checker":
         get_tx_count(TYPE_WALLET)
     else:
-        main(module)
+        main(module_to_run)
 
     print("\n❤️ Subscribe to me – https://t.me/sybilwave\n")
     print("🤑 Donate me: 0x00000b0ddce0bfda4531542ad1f2f5fad7b9cde9")

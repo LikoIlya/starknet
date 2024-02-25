@@ -1,9 +1,9 @@
 from loguru import logger
 
+from config import NINTH_CONTRACT, NINTH_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import NINTH_CONTRACT, NINTH_ABI
 
 
 class Ninth(Starknet):
@@ -17,7 +17,7 @@ class Ninth(Starknet):
     async def approve_token(self):
         logger.info(f"[{self._id}][{hex(self.address)}] Make Ninth approve")
 
-        approve_call = self.contract.functions["approve"].prepare(
+        approve_call = self.contract.functions["approve"].prepare_invoke_v1(
             0x274a2ef0e6aadb781777954ec78832fbe490de0f0f1484354b99f328f74ab36,
             20
         )

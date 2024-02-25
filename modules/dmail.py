@@ -3,10 +3,10 @@ from hashlib import sha256
 
 from loguru import logger
 
+from config import DMAIL_CONTRACT, DMAIL_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import DMAIL_CONTRACT, DMAIL_ABI
 
 
 class Dmail(Starknet):
@@ -23,7 +23,9 @@ class Dmail(Starknet):
         email_address = sha256(str(1e10 * random.random()).encode()).hexdigest()
         theme = sha256(str(1e10 * random.random()).encode()).hexdigest()
 
-        dmail_call = self.contract.functions["transaction"].prepare(email_address[0:31], theme[0:31])
+        dmail_call = self.contract.functions["transaction"].prepare_invoke_v1(
+            email_address[0:31], theme[0:31]
+        )
 
         transaction = await self.sign_transaction([dmail_call])
 

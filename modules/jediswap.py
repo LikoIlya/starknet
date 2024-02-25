@@ -6,7 +6,6 @@ from config import JEDISWAP_CONTRACT, JEDISWAP_ABI, STARKNET_TOKENS
 from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
-from . import Starknet
 
 
 class Jediswap(SwapInterface):
@@ -16,10 +15,11 @@ class Jediswap(SwapInterface):
         self.contract = self.get_contract(JEDISWAP_CONTRACT, JEDISWAP_ABI)
 
     async def get_min_amount_out(self, amount: int, slippage: float, path: list):
-        min_amount_out_data = await self.contract.functions["get_amounts_out"].prepare(
-            amountIn=amount,
-            path=path
-        ).call()
+        min_amount_out_data = (
+            await self.contract.functions["get_amounts_out"]
+            .prepare_call(amountIn=amount, path=path)
+            .call()
+        )
 
         min_amount_out = min_amount_out_data.amounts
 
@@ -61,18 +61,13 @@ class Jediswap(SwapInterface):
 
         approve_contract = self.get_contract(STARKNET_TOKENS[from_token])
 
-        approve_call = approve_contract.functions["approve"].prepare(
-            JEDISWAP_CONTRACT,
-            amount_wei
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
+            JEDISWAP_CONTRACT, amount_wei
         )
 
-        swap_call = self.contract.functions["swap_exact_tokens_for_tokens"].prepare(
-            amount_wei,
-            min_amount_out,
-            path,
-            self.address,
-            deadline
-        )
+        swap_call = self.contract.functions[
+            "swap_exact_tokens_for_tokens"
+        ].prepare_invoke_v1(amount_wei, min_amount_out, path, self.address, deadline)
 
         transaction = await self.sign_transaction([approve_call, swap_call])
 

@@ -1,13 +1,11 @@
 import random
 
 from loguru import logger
-from starknet_py.hash.selector import get_selector_from_name
-from starknet_py.net.client_models import Call
 
+from config import PYRAMID_CONTRACT, PYRAMID_ABI, STARKNET_TOKENS
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import PYRAMID_CONTRACT, PYRAMID_ABI, STARKNET_TOKENS
 
 
 class Pyramid(Starknet):
@@ -30,12 +28,12 @@ class Pyramid(Starknet):
 
         approve_contract = self.get_contract(STARKNET_TOKENS["ETH"])
 
-        approve_call = approve_contract.functions["approve"].prepare(
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
             PYRAMID_CONTRACT,
             fee_cost
         )
 
-        mint_call = self.contract.functions["mint"].prepare(
+        mint_call = self.contract.functions["mint"].prepare_invoke_v1(
             mint_id
         )
 

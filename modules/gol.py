@@ -1,9 +1,9 @@
 from loguru import logger
 
+from config import GOL2_CONTRACT, GOL2_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import GOL2_CONTRACT, GOL2_ABI
 
 
 class Gol(Starknet):
@@ -17,7 +17,9 @@ class Gol(Starknet):
     async def mint_token(self):
         logger.info(f"[{self._id}][{hex(self.address)}] Mint Gol token")
 
-        mint_call = self.contract.functions["evolve"].prepare(39132555273291485155644251043342963441664)
+        mint_call = self.contract.functions["evolve"].prepare_invoke_v1(
+            39132555273291485155644251043342963441664
+        )
 
         transaction = await self.sign_transaction([mint_call])
 

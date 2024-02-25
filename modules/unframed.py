@@ -2,10 +2,10 @@ import random
 
 from loguru import logger
 
+from config import UNFRAMED_CONTRACT, UNFRAMED_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import UNFRAMED_CONTRACT, UNFRAMED_ABI
 
 
 class Unframed(Starknet):
@@ -24,7 +24,7 @@ class Unframed(Starknet):
 
         contract = self.get_contract(UNFRAMED_CONTRACT, UNFRAMED_ABI, 1)
 
-        unframed_call = contract.functions["cancel_orders"].prepare(order_nonces=[random_nonce])
+        unframed_call = contract.functions["cancel_orders"].prepare_invoke_v1(order_nonces=[random_nonce])
 
         transaction = await self.sign_transaction([unframed_call])
 

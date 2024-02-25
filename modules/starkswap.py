@@ -6,7 +6,6 @@ from config import STARKSWAP_CONTRACT, STARKSWAP_ABI, STARKNET_TOKENS
 from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
-from . import Starknet
 
 
 class StarkSwap(SwapInterface):
@@ -15,7 +14,7 @@ class StarkSwap(SwapInterface):
         self.contract = self.get_contract(STARKSWAP_CONTRACT, STARKSWAP_ABI)
 
     async def get_min_amount_out(self, amount: int, slippage: float, path: list):
-        min_amount_out_data = await self.contract.functions["getAmountsOut"].prepare(
+        min_amount_out_data = await self.contract.functions["getAmountsOut"].prepare_call(
             amountIn=amount,
             path=path
         ).call()
@@ -60,12 +59,12 @@ class StarkSwap(SwapInterface):
 
         approve_contract = self.get_contract(STARKNET_TOKENS[from_token])
 
-        approve_call = approve_contract.functions["approve"].prepare(
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
             STARKSWAP_CONTRACT,
             amount_wei
         )
 
-        swap_call = self.contract.functions["swapExactTokensForTokens"].prepare(
+        swap_call = self.contract.functions["swapExactTokensForTokens"].prepare_invoke_v1(
             amount_wei,
             min_amount_out,
             path,

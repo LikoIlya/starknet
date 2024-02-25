@@ -1,14 +1,12 @@
 import aiohttp
-
 from loguru import logger
-from starknet_py.net.client_models import Call
 from starknet_py.hash.selector import get_selector_from_name
+from starknet_py.net.client_models import Call
 
 from config import AVNU_CONTRACT, STARKNET_TOKENS
 from modules.interface.swap import SwapInterface
 from utils.gas_checker import check_gas
 from utils.helpers import retry
-from . import Starknet
 
 
 async def get_quotes(from_token: int, to_token: int, amount: int):
@@ -90,9 +88,8 @@ class Avnu(SwapInterface):
 
         approve_contract = self.get_contract(STARKNET_TOKENS[from_token])
 
-        approve_call = approve_contract.functions["approve"].prepare(
-            AVNU_CONTRACT["router"],
-            amount_wei
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
+            AVNU_CONTRACT["router"], amount_wei
         )
 
         calldata = [int(i, 16) for i in transaction_data["calldata"]]

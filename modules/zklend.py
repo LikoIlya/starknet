@@ -3,11 +3,11 @@ from typing import List, Union
 
 from loguru import logger
 
+from config import ZKLEND_CONCTRACTS, STARKNET_TOKENS, ZKLEND_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from utils.sleeping import sleep
 from . import Starknet
-from config import ZKLEND_CONCTRACTS, STARKNET_TOKENS, ZKLEND_ABI
 
 
 class ZkLend(Starknet):
@@ -57,12 +57,12 @@ class ZkLend(Starknet):
 
         approve_contract = self.get_contract(STARKNET_TOKENS[token])
 
-        approve_call = approve_contract.functions["approve"].prepare(
+        approve_call = approve_contract.functions["approve"].prepare_invoke_v1(
             ZKLEND_CONCTRACTS["router"],
             amount_wei
         )
 
-        deposit_call = self.contract.functions["deposit"].prepare(
+        deposit_call = self.contract.functions["deposit"].prepare_invoke_v1(
             STARKNET_TOKENS[token],
             amount_wei
         )
@@ -90,7 +90,7 @@ class ZkLend(Starknet):
         )
 
         if amount > 0:
-            withdraw_all_call = self.contract.functions["withdraw_all"].prepare(
+            withdraw_all_call = self.contract.functions["withdraw_all"].prepare_invoke_v1(
                 STARKNET_TOKENS[token]
             )
 
@@ -109,7 +109,7 @@ class ZkLend(Starknet):
 
         logger.info(f"[{self._id}][{hex(self.address)}] Make enable collateral {token} for ZkLend")
 
-        enable_collateral_call = self.contract.functions["enable_collateral"].prepare(
+        enable_collateral_call = self.contract.functions["enable_collateral"].prepare_invoke_v1(
             STARKNET_TOKENS[token]
         )
 
@@ -126,7 +126,7 @@ class ZkLend(Starknet):
 
         logger.info(f"[{self._id}][{hex(self.address)}] Make disable collateral {token} for ZkLend")
 
-        disable_collateral_call = self.contract.functions["disable_collateral"].prepare(
+        disable_collateral_call = self.contract.functions["disable_collateral"].prepare_invoke_v1(
             STARKNET_TOKENS[token]
         )
 

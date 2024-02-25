@@ -1,9 +1,9 @@
 from loguru import logger
 
+from config import STARKVERSE_CONTRACT, STARKVERSE_ABI
 from utils.gas_checker import check_gas
 from utils.helpers import retry
 from . import Starknet
-from config import STARKVERSE_CONTRACT, STARKVERSE_ABI
 
 
 class Starkverse(Starknet):
@@ -17,7 +17,7 @@ class Starkverse(Starknet):
     async def mint(self):
         logger.info(f"[{self._id}][{hex(self.address)}] Mint Starkverse NFT")
 
-        mint_call = self.contract.functions["publicMint"].prepare(self.address)
+        mint_call = self.contract.functions["publicMint"].prepare_invoke_v1(self.address)
 
         transaction = await self.sign_transaction([mint_call])
 
