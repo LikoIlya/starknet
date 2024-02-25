@@ -144,7 +144,7 @@ def main(module):
 
 if __name__ == '__main__':
     print("❤️ Subscribe to me – https://t.me/sybilwave\n")
-    logger.add("logging.log", level="TRACE", filter="*")
+    logger.add("logging.log")
 
     module_to_run = get_module()
     if module_to_run == "tx_checker":
